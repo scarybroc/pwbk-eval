@@ -1,0 +1,658 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1f4e78">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="PT Eval">
+<title>PT Eval Quick Interview v2.2</title>
+<style>
+:root{
+  --bg:#f3f5f7;--card:#fff;--text:#1f2937;--muted:#6b7280;--border:#d1d5db;
+  --primary:#1f4e78;--soft:#eaf2f8;--danger:#b91c1c;--success:#0f766e
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  -webkit-text-size-adjust:100%
+}
+.wrap{max-width:980px;margin:auto;padding:14px 14px calc(30px + env(safe-area-inset-bottom))}
+.card{
+  background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;
+  margin-bottom:14px;box-shadow:0 2px 10px rgba(0,0,0,.04)
+}
+h1{font-size:1.5rem;margin:0 0 5px}
+h2{font-size:1.15rem;margin:0 0 12px}
+.muted{color:var(--muted);font-size:.88rem}
+.section-title{
+  margin:24px 0 8px;padding-bottom:6px;border-bottom:2px solid var(--soft);
+  color:var(--primary);font-size:1.12rem;font-weight:800
+}
+.q{padding:13px 0;border-top:1px solid #edf0f2}
+.q:first-of-type{border-top:0}
+.label{display:block;font-weight:750;margin-bottom:8px;line-height:1.35}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.choices{display:flex;flex-wrap:wrap;gap:8px}
+.choice{
+  position:relative;display:inline-flex;align-items:center;justify-content:center;
+  border:1px solid var(--border);border-radius:11px;padding:10px 12px;background:#fff;
+  cursor:pointer;min-height:42px;user-select:none
+}
+.choice input{position:absolute;opacity:0;pointer-events:none}
+.choice.active{background:var(--soft);border-color:var(--primary);color:var(--primary);font-weight:800}
+input[type=text],input[type=number],textarea,select{
+  width:100%;padding:11px 12px;border:1px solid var(--border);border-radius:10px;
+  font-size:16px;background:#fff;color:var(--text)
+}
+textarea{min-height:72px;resize:vertical}
+.note-under{margin-top:9px}
+.row{
+  display:grid;grid-template-columns:150px 1fr;gap:10px;align-items:start;
+  padding:10px 0;border-top:1px solid #edf0f2
+}
+.row:first-child{border-top:0}
+.rowname{font-weight:750;padding-top:10px}
+.badge{
+  display:inline-block;padding:7px 11px;border-radius:999px;background:var(--soft);
+  color:var(--primary);font-weight:800;margin-top:10px
+}
+button{
+  width:100%;border:0;border-radius:11px;padding:13px;font-size:16px;
+  font-weight:800;cursor:pointer
+}
+.primary{background:var(--primary);color:#fff}
+.dark{background:#111827;color:#fff}
+.light{background:#e5e7eb;color:#111827}
+.danger{background:#fee2e2;color:var(--danger)}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.tab{padding:10px 7px;border:1px solid var(--border);background:#fff}
+.tab.active{background:var(--soft);color:var(--primary);border-color:var(--primary)}
+.output-panel{display:none}
+.output-panel.active{display:block}
+.output{
+  width:100%;min-height:300px;height:auto;overflow:hidden;white-space:pre-wrap;
+  background:#fffdf7;border:2px solid #374151;border-radius:11px;padding:12px;line-height:1.45
+}
+.status{text-align:center;color:var(--muted);min-height:20px;margin-top:8px;font-size:.88rem}
+@media(max-width:680px){
+  .grid2,.grid3,.actions{grid-template-columns:1fr}
+  .row{grid-template-columns:1fr}
+  .rowname{padding-top:0}
+  .tabs{grid-template-columns:repeat(3,1fr)}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="card">
+  <h1>PT Eval Quick Interview</h1>
+  <div class="muted">Complete subjective interview + functional assessment. Tap answers and generate a summary.</div>
+</div>
+
+<form id="evalForm" class="card">
+
+<div class="grid2">
+  <div><label class="label">Patient name / initials</label><input id="patientName" type="text"></div>
+  <div><label class="label">Room #</label><input id="room" type="text"></div>
+</div>
+
+<div class="section-title">A&O / Orientation Questions</div>
+
+<div class="q">
+  <span class="label">What is your name?</span>
+  <div class="choices">
+    <label class="choice"><input type="radio" name="aoName" value="Correct">Correct</label>
+    <label class="choice"><input type="radio" name="aoName" value="Incorrect">Incorrect</label>
+    <label class="choice"><input type="radio" name="aoName" value="Unable">Unable</label>
+  </div>
+  <input id="aoNameNote" class="note-under" type="text" placeholder="Optional response/details">
+</div>
+
+<div class="q">
+  <span class="label">What year is it?</span>
+  <div class="choices">
+    <label class="choice"><input type="radio" name="aoYear" value="Correct">Correct</label>
+    <label class="choice"><input type="radio" name="aoYear" value="Incorrect">Incorrect</label>
+    <label class="choice"><input type="radio" name="aoYear" value="Unable">Unable</label>
+  </div>
+  <input id="aoYearNote" class="note-under" type="text" placeholder="Optional response/details">
+</div>
+
+<div class="q">
+  <span class="label">What month is it?</span>
+  <div class="choices">
+    <label class="choice"><input type="radio" name="aoMonth" value="Correct">Correct</label>
+    <label class="choice"><input type="radio" name="aoMonth" value="Incorrect">Incorrect</label>
+    <label class="choice"><input type="radio" name="aoMonth" value="Unable">Unable</label>
+  </div>
+  <input id="aoMonthNote" class="note-under" type="text" placeholder="Optional response/details">
+</div>
+
+<div class="q">
+  <span class="label">Where are you right now?</span>
+  <div class="choices">
+    <label class="choice"><input type="radio" name="aoPlace" value="Correct">Correct</label>
+    <label class="choice"><input type="radio" name="aoPlace" value="Incorrect">Incorrect</label>
+    <label class="choice"><input type="radio" name="aoPlace" value="Unable">Unable</label>
+  </div>
+  <input id="aoPlaceNote" class="note-under" type="text" placeholder="Optional response/details">
+</div>
+
+<div class="q">
+  <span class="label">What hospital/facility are you in?</span>
+  <div class="choices">
+    <label class="choice"><input type="radio" name="aoFacility" value="Correct">Correct</label>
+    <label class="choice"><input type="radio" name="aoFacility" value="Incorrect">Incorrect</label>
+    <label class="choice"><input type="radio" name="aoFacility" value="Unable">Unable</label>
+  </div>
+  <input id="aoFacilityNote" class="note-under" type="text" placeholder="Optional response/details">
+</div>
+
+<div class="q">
+  <span class="label">Do you understand your current condition / why you are here?</span>
+  <div class="choices">
+    <label class="choice"><input type="radio" name="condition" value="Correct">Correct</label>
+    <label class="choice"><input type="radio" name="condition" value="Partial">Partial</label>
+    <label class="choice"><input type="radio" name="condition" value="Incorrect">Incorrect</label>
+    <label class="choice"><input type="radio" name="condition" value="Unable">Unable</label>
+  </div>
+  <input id="conditionNote" class="note-under" type="text" placeholder="Optional note">
+  <div id="aoBadge" class="badge">A&O level: Not enough information</div>
+</div>
+
+<div class="section-title">Subjective Interview</div>
+
+<div class="q">
+  <span class="label">Prior level of function (PLOF)</span>
+  <div class="choices">
+    <label class="choice"><input type="radio" name="plof" value="Independent">Independent</label>
+    <label class="choice"><input type="radio" name="plof" value="Modified independent">Mod I</label>
+    <label class="choice"><input type="radio" name="plof" value="Supervision">Supervision</label>
+    <label class="choice"><input type="radio" name="plof" value="SBA">SBA</label>
+    <label class="choice"><input type="radio" name="plof" value="CGA">CGA</label>
+    <label class="choice"><input type="radio" name="plof" value="Min A">Min A</label>
+    <label class="choice"><input type="radio" name="plof" value="Mod A">Mod A</label>
+    <label class="choice"><input type="radio" name="plof" value="Max A">Max A</label>
+    <label class="choice"><input type="radio" name="plof" value="Unknown/poor historian">Unknown</label>
+  </div>
+  <textarea id="plofNote" class="note-under" placeholder="Optional PLOF details"></textarea>
+</div>
+
+<div class="q">
+  <span class="label">Living situation</span>
+  <div class="choices">
+    <label class="choice"><input type="radio" name="living" value="Alone">Alone</label>
+    <label class="choice"><input type="radio" name="living" value="With family">With family</label>
+    <label class="choice"><input type="radio" name="living" value="With caregiver">With caregiver</label>
+    <label class="choice"><input type="radio" name="living" value="Board and care">Board & care</label>
+    <label class="choice"><input type="radio" name="living" value="SNF/LTC">SNF/LTC</label>
+    <label class="choice"><input type="radio" name="living" value="Unknown">Unknown</label>
+  </div>
+  <input id="livingNote" class="note-under" type="text" placeholder="Optional details">
+</div>
+
+<div class="q">
+  <span class="label">Home type</span>
+  <div class="choices">
+    <label class="choice"><input type="radio" name="homeType" value="House">House</label>
+    <label class="choice"><input type="radio" name="homeType" value="Apartment">Apartment</label>
+    <label class="choice"><input type="radio" name="homeType" value="Condo">Condo</label>
+    <label class="choice"><input type="radio" name="homeType" value="Facility">Facility</label>
+    <label class="choice"><input type="radio" name="homeType" value="Unknown">Unknown</label>
+  </div>
+  <div class="grid2 note-under">
+    <input id="ste" type="number" min="0" inputmode="numeric" placeholder="# STE">
+    <input id="homeNote" type="text" placeholder="Rails, elevator, floor, etc.">
+  </div>
+</div>
+
+<div class="q">
+  <span class="label">Pain</span>
+  <div class="grid3">
+    <input id="painLocation" type="text" placeholder="Location">
+    <input id="painRating" type="number" min="0" max="10" inputmode="numeric" placeholder="0–10">
+    <select id="painType">
+      <option value="">Pain type</option>
+      <option>Sharp</option><option>Aching</option><option>Burning</option><option>Throbbing</option><option>Sore</option><option>Other</option>
+    </select>
+  </div>
+  <input id="painNote" class="note-under" type="text" placeholder="Aggravating/easing factors or other details">
+</div>
+
+<div class="q">
+  <span class="label">Prior assistive device</span>
+  <div class="choices">
+    <label class="choice"><input type="checkbox" name="device" value="None">None</label>
+    <label class="choice"><input type="checkbox" name="device" value="SPC">SPC</label>
+    <label class="choice"><input type="checkbox" name="device" value="QC">QC</label>
+    <label class="choice"><input type="checkbox" name="device" value="FWW">FWW</label>
+    <label class="choice"><input type="checkbox" name="device" value="4WW">4WW</label>
+    <label class="choice"><input type="checkbox" name="device" value="Wheelchair">Wheelchair</label>
+    <label class="choice"><input type="checkbox" name="device" value="Other">Other</label>
+  </div>
+  <input id="deviceNote" class="note-under" type="text" placeholder="Optional device details">
+</div>
+
+<div class="q">
+  <span class="label">Vision / hearing</span>
+  <div class="grid2">
+    <div>
+      <div class="choices">
+        <label class="choice"><input type="radio" name="vision" value="Intact">Vision intact</label>
+        <label class="choice"><input type="radio" name="vision" value="Impaired">Vision impaired</label>
+        <label class="choice"><input type="radio" name="vision" value="Unknown">Unknown</label>
+      </div>
+    </div>
+    <div>
+      <div class="choices">
+        <label class="choice"><input type="radio" name="hearing" value="Intact">Hearing intact</label>
+        <label class="choice"><input type="radio" name="hearing" value="Impaired">Hearing impaired</label>
+        <label class="choice"><input type="radio" name="hearing" value="Unknown">Unknown</label>
+      </div>
+    </div>
+  </div>
+  <input id="sensoryNote" class="note-under" type="text" placeholder="Glasses, hearing aids, side affected, etc.">
+</div>
+
+<div class="q">
+  <span class="label">Falls in the past year?</span>
+  <div class="choices">
+    <label class="choice"><input type="radio" name="falls" value="Denies falls">Denies</label>
+    <label class="choice"><input type="radio" name="falls" value="1 fall">1</label>
+    <label class="choice"><input type="radio" name="falls" value="2 or more falls">2+</label>
+    <label class="choice"><input type="radio" name="falls" value="Unknown">Unknown</label>
+  </div>
+  <input id="fallNote" class="note-under" type="text" placeholder="Optional fall details">
+</div>
+
+<div class="q">
+  <span class="label">Fear of falling?</span>
+  <div class="choices">
+    <label class="choice"><input type="radio" name="fearFall" value="No">No</label>
+    <label class="choice"><input type="radio" name="fearFall" value="Yes">Yes</label>
+    <label class="choice"><input type="radio" name="fearFall" value="Unable to assess">Unable to assess</label>
+  </div>
+</div>
+
+<div class="q">
+  <span class="label">What is the most difficult thing for you right now?</span>
+  <textarea id="difficultTask" placeholder="Patient's main complaint or functional difficulty"></textarea>
+</div>
+
+<div class="q">
+  <span class="label">PHQ-2: Little interest or pleasure in doing things?</span>
+  <div class="choices">
+    <label class="choice"><input type="radio" name="phq1" value="0 - Not at all">0</label>
+    <label class="choice"><input type="radio" name="phq1" value="1 - Several days">1</label>
+    <label class="choice"><input type="radio" name="phq1" value="2 - More than half the days">2</label>
+    <label class="choice"><input type="radio" name="phq1" value="3 - Nearly every day">3</label>
+  </div>
+</div>
+
+<div class="q">
+  <span class="label">PHQ-2: Feeling down, depressed, or hopeless?</span>
+  <div class="choices">
+    <label class="choice"><input type="radio" name="phq2" value="0 - Not at all">0</label>
+    <label class="choice"><input type="radio" name="phq2" value="1 - Several days">1</label>
+    <label class="choice"><input type="radio" name="phq2" value="2 - More than half the days">2</label>
+    <label class="choice"><input type="radio" name="phq2" value="3 - Nearly every day">3</label>
+  </div>
+</div>
+
+<div class="section-title">Range of Motion</div>
+<div id="romRows"><div class="row"><div class="rowname">L hip</div><div><div class="choices"><label class="choice"><input type="radio" name="romLHip" value="WNL">WNL</label><label class="choice"><input type="radio" name="romLHip" value="WFL">WFL</label><label class="choice"><input type="radio" name="romLHip" value="Impaired">Impaired</label><label class="choice"><input type="radio" name="romLHip" value="DNT">DNT</label></div></div></div><div class="row"><div class="rowname">L knee</div><div><div class="choices"><label class="choice"><input type="radio" name="romLKnee" value="WNL">WNL</label><label class="choice"><input type="radio" name="romLKnee" value="WFL">WFL</label><label class="choice"><input type="radio" name="romLKnee" value="Impaired">Impaired</label><label class="choice"><input type="radio" name="romLKnee" value="DNT">DNT</label></div></div></div><div class="row"><div class="rowname">L ankle</div><div><div class="choices"><label class="choice"><input type="radio" name="romLAnkle" value="WNL">WNL</label><label class="choice"><input type="radio" name="romLAnkle" value="WFL">WFL</label><label class="choice"><input type="radio" name="romLAnkle" value="Impaired">Impaired</label><label class="choice"><input type="radio" name="romLAnkle" value="DNT">DNT</label></div></div></div><div class="row"><div class="rowname">R hip</div><div><div class="choices"><label class="choice"><input type="radio" name="romRHip" value="WNL">WNL</label><label class="choice"><input type="radio" name="romRHip" value="WFL">WFL</label><label class="choice"><input type="radio" name="romRHip" value="Impaired">Impaired</label><label class="choice"><input type="radio" name="romRHip" value="DNT">DNT</label></div></div></div><div class="row"><div class="rowname">R knee</div><div><div class="choices"><label class="choice"><input type="radio" name="romRKnee" value="WNL">WNL</label><label class="choice"><input type="radio" name="romRKnee" value="WFL">WFL</label><label class="choice"><input type="radio" name="romRKnee" value="Impaired">Impaired</label><label class="choice"><input type="radio" name="romRKnee" value="DNT">DNT</label></div></div></div><div class="row"><div class="rowname">R ankle</div><div><div class="choices"><label class="choice"><input type="radio" name="romRAnkle" value="WNL">WNL</label><label class="choice"><input type="radio" name="romRAnkle" value="WFL">WFL</label><label class="choice"><input type="radio" name="romRAnkle" value="Impaired">Impaired</label><label class="choice"><input type="radio" name="romRAnkle" value="DNT">DNT</label></div></div></div></div>
+<textarea id="romNote" placeholder="ROM details: direction, degrees, pain, contracture, etc."></textarea>
+
+<div class="section-title">MMT / Strength</div>
+<div class="q"><span class="label">Gross lower-extremity MMT</span><div id="grossMmtRows"><div class="row"><div class="rowname">Gross LLE</div><div><div class="choices"><label class="choice"><input type="radio" name="mmtLLE" value="5">5</label><label class="choice"><input type="radio" name="mmtLLE" value="4+">4+</label><label class="choice"><input type="radio" name="mmtLLE" value="4">4</label><label class="choice"><input type="radio" name="mmtLLE" value="4-">4-</label><label class="choice"><input type="radio" name="mmtLLE" value="3+">3+</label><label class="choice"><input type="radio" name="mmtLLE" value="3">3</label><label class="choice"><input type="radio" name="mmtLLE" value="3-">3-</label><label class="choice"><input type="radio" name="mmtLLE" value="2+">2+</label><label class="choice"><input type="radio" name="mmtLLE" value="2">2</label><label class="choice"><input type="radio" name="mmtLLE" value="2-">2-</label><label class="choice"><input type="radio" name="mmtLLE" value="1">1</label><label class="choice"><input type="radio" name="mmtLLE" value="0">0</label><label class="choice"><input type="radio" name="mmtLLE" value="DNT">DNT</label></div></div></div><div class="row"><div class="rowname">Gross RLE</div><div><div class="choices"><label class="choice"><input type="radio" name="mmtRLE" value="5">5</label><label class="choice"><input type="radio" name="mmtRLE" value="4+">4+</label><label class="choice"><input type="radio" name="mmtRLE" value="4">4</label><label class="choice"><input type="radio" name="mmtRLE" value="4-">4-</label><label class="choice"><input type="radio" name="mmtRLE" value="3+">3+</label><label class="choice"><input type="radio" name="mmtRLE" value="3">3</label><label class="choice"><input type="radio" name="mmtRLE" value="3-">3-</label><label class="choice"><input type="radio" name="mmtRLE" value="2+">2+</label><label class="choice"><input type="radio" name="mmtRLE" value="2">2</label><label class="choice"><input type="radio" name="mmtRLE" value="2-">2-</label><label class="choice"><input type="radio" name="mmtRLE" value="1">1</label><label class="choice"><input type="radio" name="mmtRLE" value="0">0</label><label class="choice"><input type="radio" name="mmtRLE" value="DNT">DNT</label></div></div></div></div></div>
+<div class="q"><span class="label">Optional joint-specific MMT</span><div id="jointMmtRows"><div class="row"><div class="rowname">L hip</div><div><div class="choices"><label class="choice"><input type="radio" name="mmtLHip" value="5">5</label><label class="choice"><input type="radio" name="mmtLHip" value="4+">4+</label><label class="choice"><input type="radio" name="mmtLHip" value="4">4</label><label class="choice"><input type="radio" name="mmtLHip" value="4-">4-</label><label class="choice"><input type="radio" name="mmtLHip" value="3+">3+</label><label class="choice"><input type="radio" name="mmtLHip" value="3">3</label><label class="choice"><input type="radio" name="mmtLHip" value="3-">3-</label><label class="choice"><input type="radio" name="mmtLHip" value="2+">2+</label><label class="choice"><input type="radio" name="mmtLHip" value="2">2</label><label class="choice"><input type="radio" name="mmtLHip" value="2-">2-</label><label class="choice"><input type="radio" name="mmtLHip" value="1">1</label><label class="choice"><input type="radio" name="mmtLHip" value="0">0</label><label class="choice"><input type="radio" name="mmtLHip" value="DNT">DNT</label></div></div></div><div class="row"><div class="rowname">L knee</div><div><div class="choices"><label class="choice"><input type="radio" name="mmtLKnee" value="5">5</label><label class="choice"><input type="radio" name="mmtLKnee" value="4+">4+</label><label class="choice"><input type="radio" name="mmtLKnee" value="4">4</label><label class="choice"><input type="radio" name="mmtLKnee" value="4-">4-</label><label class="choice"><input type="radio" name="mmtLKnee" value="3+">3+</label><label class="choice"><input type="radio" name="mmtLKnee" value="3">3</label><label class="choice"><input type="radio" name="mmtLKnee" value="3-">3-</label><label class="choice"><input type="radio" name="mmtLKnee" value="2+">2+</label><label class="choice"><input type="radio" name="mmtLKnee" value="2">2</label><label class="choice"><input type="radio" name="mmtLKnee" value="2-">2-</label><label class="choice"><input type="radio" name="mmtLKnee" value="1">1</label><label class="choice"><input type="radio" name="mmtLKnee" value="0">0</label><label class="choice"><input type="radio" name="mmtLKnee" value="DNT">DNT</label></div></div></div><div class="row"><div class="rowname">L ankle</div><div><div class="choices"><label class="choice"><input type="radio" name="mmtLAnkle" value="5">5</label><label class="choice"><input type="radio" name="mmtLAnkle" value="4+">4+</label><label class="choice"><input type="radio" name="mmtLAnkle" value="4">4</label><label class="choice"><input type="radio" name="mmtLAnkle" value="4-">4-</label><label class="choice"><input type="radio" name="mmtLAnkle" value="3+">3+</label><label class="choice"><input type="radio" name="mmtLAnkle" value="3">3</label><label class="choice"><input type="radio" name="mmtLAnkle" value="3-">3-</label><label class="choice"><input type="radio" name="mmtLAnkle" value="2+">2+</label><label class="choice"><input type="radio" name="mmtLAnkle" value="2">2</label><label class="choice"><input type="radio" name="mmtLAnkle" value="2-">2-</label><label class="choice"><input type="radio" name="mmtLAnkle" value="1">1</label><label class="choice"><input type="radio" name="mmtLAnkle" value="0">0</label><label class="choice"><input type="radio" name="mmtLAnkle" value="DNT">DNT</label></div></div></div><div class="row"><div class="rowname">R hip</div><div><div class="choices"><label class="choice"><input type="radio" name="mmtRHip" value="5">5</label><label class="choice"><input type="radio" name="mmtRHip" value="4+">4+</label><label class="choice"><input type="radio" name="mmtRHip" value="4">4</label><label class="choice"><input type="radio" name="mmtRHip" value="4-">4-</label><label class="choice"><input type="radio" name="mmtRHip" value="3+">3+</label><label class="choice"><input type="radio" name="mmtRHip" value="3">3</label><label class="choice"><input type="radio" name="mmtRHip" value="3-">3-</label><label class="choice"><input type="radio" name="mmtRHip" value="2+">2+</label><label class="choice"><input type="radio" name="mmtRHip" value="2">2</label><label class="choice"><input type="radio" name="mmtRHip" value="2-">2-</label><label class="choice"><input type="radio" name="mmtRHip" value="1">1</label><label class="choice"><input type="radio" name="mmtRHip" value="0">0</label><label class="choice"><input type="radio" name="mmtRHip" value="DNT">DNT</label></div></div></div><div class="row"><div class="rowname">R knee</div><div><div class="choices"><label class="choice"><input type="radio" name="mmtRKnee" value="5">5</label><label class="choice"><input type="radio" name="mmtRKnee" value="4+">4+</label><label class="choice"><input type="radio" name="mmtRKnee" value="4">4</label><label class="choice"><input type="radio" name="mmtRKnee" value="4-">4-</label><label class="choice"><input type="radio" name="mmtRKnee" value="3+">3+</label><label class="choice"><input type="radio" name="mmtRKnee" value="3">3</label><label class="choice"><input type="radio" name="mmtRKnee" value="3-">3-</label><label class="choice"><input type="radio" name="mmtRKnee" value="2+">2+</label><label class="choice"><input type="radio" name="mmtRKnee" value="2">2</label><label class="choice"><input type="radio" name="mmtRKnee" value="2-">2-</label><label class="choice"><input type="radio" name="mmtRKnee" value="1">1</label><label class="choice"><input type="radio" name="mmtRKnee" value="0">0</label><label class="choice"><input type="radio" name="mmtRKnee" value="DNT">DNT</label></div></div></div><div class="row"><div class="rowname">R ankle</div><div><div class="choices"><label class="choice"><input type="radio" name="mmtRAnkle" value="5">5</label><label class="choice"><input type="radio" name="mmtRAnkle" value="4+">4+</label><label class="choice"><input type="radio" name="mmtRAnkle" value="4">4</label><label class="choice"><input type="radio" name="mmtRAnkle" value="4-">4-</label><label class="choice"><input type="radio" name="mmtRAnkle" value="3+">3+</label><label class="choice"><input type="radio" name="mmtRAnkle" value="3">3</label><label class="choice"><input type="radio" name="mmtRAnkle" value="3-">3-</label><label class="choice"><input type="radio" name="mmtRAnkle" value="2+">2+</label><label class="choice"><input type="radio" name="mmtRAnkle" value="2">2</label><label class="choice"><input type="radio" name="mmtRAnkle" value="2-">2-</label><label class="choice"><input type="radio" name="mmtRAnkle" value="1">1</label><label class="choice"><input type="radio" name="mmtRAnkle" value="0">0</label><label class="choice"><input type="radio" name="mmtRAnkle" value="DNT">DNT</label></div></div></div></div></div>
+<textarea id="mmtNote" placeholder="Strength notes: pain limitation, trace movement, unable to isolate, etc."></textarea>
+
+<div class="section-title">Bed Mobility</div>
+<div id="bedRows"><div class="row"><div class="rowname">Rolling left</div><div><div class="choices"><label class="choice"><input type="radio" name="rollL" value="Independent">Independent</label><label class="choice"><input type="radio" name="rollL" value="Modified independent">Modified independent</label><label class="choice"><input type="radio" name="rollL" value="Setup">Setup</label><label class="choice"><input type="radio" name="rollL" value="Supervision">Supervision</label><label class="choice"><input type="radio" name="rollL" value="SBA">SBA</label><label class="choice"><input type="radio" name="rollL" value="CGA">CGA</label><label class="choice"><input type="radio" name="rollL" value="Min A">Min A</label><label class="choice"><input type="radio" name="rollL" value="Mod A">Mod A</label><label class="choice"><input type="radio" name="rollL" value="Max A">Max A</label><label class="choice"><input type="radio" name="rollL" value="TD+">TD+</label><label class="choice"><input type="radio" name="rollL" value="TD">TD</label><label class="choice"><input type="radio" name="rollL" value="Unable">Unable</label><label class="choice"><input type="radio" name="rollL" value="DNT">DNT</label></div></div></div><div class="row"><div class="rowname">Rolling right</div><div><div class="choices"><label class="choice"><input type="radio" name="rollR" value="Independent">Independent</label><label class="choice"><input type="radio" name="rollR" value="Modified independent">Modified independent</label><label class="choice"><input type="radio" name="rollR" value="Setup">Setup</label><label class="choice"><input type="radio" name="rollR" value="Supervision">Supervision</label><label class="choice"><input type="radio" name="rollR" value="SBA">SBA</label><label class="choice"><input type="radio" name="rollR" value="CGA">CGA</label><label class="choice"><input type="radio" name="rollR" value="Min A">Min A</label><label class="choice"><input type="radio" name="rollR" value="Mod A">Mod A</label><label class="choice"><input type="radio" name="rollR" value="Max A">Max A</label><label class="choice"><input type="radio" name="rollR" value="TD+">TD+</label><label class="choice"><input type="radio" name="rollR" value="TD">TD</label><label class="choice"><input type="radio" name="rollR" value="Unable">Unable</label><label class="choice"><input type="radio" name="rollR" value="DNT">DNT</label></div></div></div><div class="row"><div class="rowname">Supine → sit</div><div><div class="choices"><label class="choice"><input type="radio" name="supSit" value="Independent">Independent</label><label class="choice"><input type="radio" name="supSit" value="Modified independent">Modified independent</label><label class="choice"><input type="radio" name="supSit" value="Setup">Setup</label><label class="choice"><input type="radio" name="supSit" value="Supervision">Supervision</label><label class="choice"><input type="radio" name="supSit" value="SBA">SBA</label><label class="choice"><input type="radio" name="supSit" value="CGA">CGA</label><label class="choice"><input type="radio" name="supSit" value="Min A">Min A</label><label class="choice"><input type="radio" name="supSit" value="Mod A">Mod A</label><label class="choice"><input type="radio" name="supSit" value="Max A">Max A</label><label class="choice"><input type="radio" name="supSit" value="TD+">TD+</label><label class="choice"><input type="radio" name="supSit" value="TD">TD</label><label class="choice"><input type="radio" name="supSit" value="Unable">Unable</label><label class="choice"><input type="radio" name="supSit" value="DNT">DNT</label></div></div></div><div class="row"><div class="rowname">Sit → supine</div><div><div class="choices"><label class="choice"><input type="radio" name="sitSup" value="Independent">Independent</label><label class="choice"><input type="radio" name="sitSup" value="Modified independent">Modified independent</label><label class="choice"><input type="radio" name="sitSup" value="Setup">Setup</label><label class="choice"><input type="radio" name="sitSup" value="Supervision">Supervision</label><label class="choice"><input type="radio" name="sitSup" value="SBA">SBA</label><label class="choice"><input type="radio" name="sitSup" value="CGA">CGA</label><label class="choice"><input type="radio" name="sitSup" value="Min A">Min A</label><label class="choice"><input type="radio" name="sitSup" value="Mod A">Mod A</label><label class="choice"><input type="radio" name="sitSup" value="Max A">Max A</label><label class="choice"><input type="radio" name="sitSup" value="TD+">TD+</label><label class="choice"><input type="radio" name="sitSup" value="TD">TD</label><label class="choice"><input type="radio" name="sitSup" value="Unable">Unable</label><label class="choice"><input type="radio" name="sitSup" value="DNT">DNT</label></div></div></div></div>
+<textarea id="bedNote" placeholder="Bed mobility notes: rail use, cues, sequencing, assistance details"></textarea>
+
+<div class="section-title">Transfers</div>
+<div id="transferRows"><div class="row"><div class="rowname">Sit → stand</div><div><div class="choices"><label class="choice"><input type="radio" name="sitStand" value="Independent">Independent</label><label class="choice"><input type="radio" name="sitStand" value="Modified independent">Modified independent</label><label class="choice"><input type="radio" name="sitStand" value="Setup">Setup</label><label class="choice"><input type="radio" name="sitStand" value="Supervision">Supervision</label><label class="choice"><input type="radio" name="sitStand" value="SBA">SBA</label><label class="choice"><input type="radio" name="sitStand" value="CGA">CGA</label><label class="choice"><input type="radio" name="sitStand" value="Min A">Min A</label><label class="choice"><input type="radio" name="sitStand" value="Mod A">Mod A</label><label class="choice"><input type="radio" name="sitStand" value="Max A">Max A</label><label class="choice"><input type="radio" name="sitStand" value="TD+">TD+</label><label class="choice"><input type="radio" name="sitStand" value="TD">TD</label><label class="choice"><input type="radio" name="sitStand" value="Unable">Unable</label><label class="choice"><input type="radio" name="sitStand" value="DNT">DNT</label></div></div></div><div class="row"><div class="rowname">Stand → sit</div><div><div class="choices"><label class="choice"><input type="radio" name="standSit" value="Independent">Independent</label><label class="choice"><input type="radio" name="standSit" value="Modified independent">Modified independent</label><label class="choice"><input type="radio" name="standSit" value="Setup">Setup</label><label class="choice"><input type="radio" name="standSit" value="Supervision">Supervision</label><label class="choice"><input type="radio" name="standSit" value="SBA">SBA</label><label class="choice"><input type="radio" name="standSit" value="CGA">CGA</label><label class="choice"><input type="radio" name="standSit" value="Min A">Min A</label><label class="choice"><input type="radio" name="standSit" value="Mod A">Mod A</label><label class="choice"><input type="radio" name="standSit" value="Max A">Max A</label><label class="choice"><input type="radio" name="standSit" value="TD+">TD+</label><label class="choice"><input type="radio" name="standSit" value="TD">TD</label><label class="choice"><input type="radio" name="standSit" value="Unable">Unable</label><label class="choice"><input type="radio" name="standSit" value="DNT">DNT</label></div></div></div><div class="row"><div class="rowname">Bed ↔ chair/WC</div><div><div class="choices"><label class="choice"><input type="radio" name="bedChair" value="Independent">Independent</label><label class="choice"><input type="radio" name="bedChair" value="Modified independent">Modified independent</label><label class="choice"><input type="radio" name="bedChair" value="Setup">Setup</label><label class="choice"><input type="radio" name="bedChair" value="Supervision">Supervision</label><label class="choice"><input type="radio" name="bedChair" value="SBA">SBA</label><label class="choice"><input type="radio" name="bedChair" value="CGA">CGA</label><label class="choice"><input type="radio" name="bedChair" value="Min A">Min A</label><label class="choice"><input type="radio" name="bedChair" value="Mod A">Mod A</label><label class="choice"><input type="radio" name="bedChair" value="Max A">Max A</label><label class="choice"><input type="radio" name="bedChair" value="TD+">TD+</label><label class="choice"><input type="radio" name="bedChair" value="TD">TD</label><label class="choice"><input type="radio" name="bedChair" value="Unable">Unable</label><label class="choice"><input type="radio" name="bedChair" value="DNT">DNT</label></div></div></div><div class="row"><div class="rowname">Toilet transfer</div><div><div class="choices"><label class="choice"><input type="radio" name="toiletTransfer" value="Independent">Independent</label><label class="choice"><input type="radio" name="toiletTransfer" value="Modified independent">Modified independent</label><label class="choice"><input type="radio" name="toiletTransfer" value="Setup">Setup</label><label class="choice"><input type="radio" name="toiletTransfer" value="Supervision">Supervision</label><label class="choice"><input type="radio" name="toiletTransfer" value="SBA">SBA</label><label class="choice"><input type="radio" name="toiletTransfer" value="CGA">CGA</label><label class="choice"><input type="radio" name="toiletTransfer" value="Min A">Min A</label><label class="choice"><input type="radio" name="toiletTransfer" value="Mod A">Mod A</label><label class="choice"><input type="radio" name="toiletTransfer" value="Max A">Max A</label><label class="choice"><input type="radio" name="toiletTransfer" value="TD+">TD+</label><label class="choice"><input type="radio" name="toiletTransfer" value="TD">TD</label><label class="choice"><input type="radio" name="toiletTransfer" value="Unable">Unable</label><label class="choice"><input type="radio" name="toiletTransfer" value="DNT">DNT</label></div></div></div></div>
+<textarea id="transferNote" placeholder="Transfer notes: device, cues, technique, safety details"></textarea>
+
+<div class="section-title">Ambulation</div>
+<div class="q">
+  <span class="label">Ambulation assistance level</span>
+  <div id="gaitAssistChoices" class="choices"><label class="choice"><input type="radio" name="gaitAssist" value="Independent">Independent</label><label class="choice"><input type="radio" name="gaitAssist" value="Modified independent">Modified independent</label><label class="choice"><input type="radio" name="gaitAssist" value="Setup">Setup</label><label class="choice"><input type="radio" name="gaitAssist" value="Supervision">Supervision</label><label class="choice"><input type="radio" name="gaitAssist" value="SBA">SBA</label><label class="choice"><input type="radio" name="gaitAssist" value="CGA">CGA</label><label class="choice"><input type="radio" name="gaitAssist" value="Min A">Min A</label><label class="choice"><input type="radio" name="gaitAssist" value="Mod A">Mod A</label><label class="choice"><input type="radio" name="gaitAssist" value="Max A">Max A</label><label class="choice"><input type="radio" name="gaitAssist" value="TD+">TD+</label><label class="choice"><input type="radio" name="gaitAssist" value="TD">TD</label><label class="choice"><input type="radio" name="gaitAssist" value="Unable">Unable</label><label class="choice"><input type="radio" name="gaitAssist" value="DNT">DNT</label></div>
+  <div class="grid3 note-under">
+    <input id="gaitFeet" type="number" min="0" inputmode="numeric" placeholder="Distance (ft)">
+    <select id="gaitDevice">
+      <option value="">Assistive device</option>
+      <option>None</option><option>SPC</option><option>QC</option><option>FWW</option><option>4WW</option>
+      <option>Hemiwalker</option><option>Parallel bars</option><option>Wheelchair follow</option><option>Other</option>
+    </select>
+    <input id="gaitTrials" type="number" min="1" inputmode="numeric" placeholder="# trials">
+  </div>
+  <textarea id="gaitNote" class="note-under" placeholder="Gait pattern, cues, rest breaks, WB status, safety"></textarea>
+</div>
+
+<div class="section-title">Balance</div>
+<div id="balanceRows"><div class="row"><div class="rowname">Static sitting</div><div><div class="choices"><label class="choice"><input type="radio" name="balStaticSit" value="Normal">Normal</label><label class="choice"><input type="radio" name="balStaticSit" value="Good+">Good+</label><label class="choice"><input type="radio" name="balStaticSit" value="Good">Good</label><label class="choice"><input type="radio" name="balStaticSit" value="Good-">Good-</label><label class="choice"><input type="radio" name="balStaticSit" value="Fair+">Fair+</label><label class="choice"><input type="radio" name="balStaticSit" value="Fair">Fair</label><label class="choice"><input type="radio" name="balStaticSit" value="Fair-">Fair-</label><label class="choice"><input type="radio" name="balStaticSit" value="Poor+">Poor+</label><label class="choice"><input type="radio" name="balStaticSit" value="Poor">Poor</label><label class="choice"><input type="radio" name="balStaticSit" value="Unable">Unable</label><label class="choice"><input type="radio" name="balStaticSit" value="DNT">DNT</label></div></div></div><div class="row"><div class="rowname">Dynamic sitting</div><div><div class="choices"><label class="choice"><input type="radio" name="balDynamicSit" value="Normal">Normal</label><label class="choice"><input type="radio" name="balDynamicSit" value="Good+">Good+</label><label class="choice"><input type="radio" name="balDynamicSit" value="Good">Good</label><label class="choice"><input type="radio" name="balDynamicSit" value="Good-">Good-</label><label class="choice"><input type="radio" name="balDynamicSit" value="Fair+">Fair+</label><label class="choice"><input type="radio" name="balDynamicSit" value="Fair">Fair</label><label class="choice"><input type="radio" name="balDynamicSit" value="Fair-">Fair-</label><label class="choice"><input type="radio" name="balDynamicSit" value="Poor+">Poor+</label><label class="choice"><input type="radio" name="balDynamicSit" value="Poor">Poor</label><label class="choice"><input type="radio" name="balDynamicSit" value="Unable">Unable</label><label class="choice"><input type="radio" name="balDynamicSit" value="DNT">DNT</label></div></div></div><div class="row"><div class="rowname">Static standing</div><div><div class="choices"><label class="choice"><input type="radio" name="balStaticStand" value="Normal">Normal</label><label class="choice"><input type="radio" name="balStaticStand" value="Good+">Good+</label><label class="choice"><input type="radio" name="balStaticStand" value="Good">Good</label><label class="choice"><input type="radio" name="balStaticStand" value="Good-">Good-</label><label class="choice"><input type="radio" name="balStaticStand" value="Fair+">Fair+</label><label class="choice"><input type="radio" name="balStaticStand" value="Fair">Fair</label><label class="choice"><input type="radio" name="balStaticStand" value="Fair-">Fair-</label><label class="choice"><input type="radio" name="balStaticStand" value="Poor+">Poor+</label><label class="choice"><input type="radio" name="balStaticStand" value="Poor">Poor</label><label class="choice"><input type="radio" name="balStaticStand" value="Unable">Unable</label><label class="choice"><input type="radio" name="balStaticStand" value="DNT">DNT</label></div></div></div><div class="row"><div class="rowname">Dynamic standing</div><div><div class="choices"><label class="choice"><input type="radio" name="balDynamicStand" value="Normal">Normal</label><label class="choice"><input type="radio" name="balDynamicStand" value="Good+">Good+</label><label class="choice"><input type="radio" name="balDynamicStand" value="Good">Good</label><label class="choice"><input type="radio" name="balDynamicStand" value="Good-">Good-</label><label class="choice"><input type="radio" name="balDynamicStand" value="Fair+">Fair+</label><label class="choice"><input type="radio" name="balDynamicStand" value="Fair">Fair</label><label class="choice"><input type="radio" name="balDynamicStand" value="Fair-">Fair-</label><label class="choice"><input type="radio" name="balDynamicStand" value="Poor+">Poor+</label><label class="choice"><input type="radio" name="balDynamicStand" value="Poor">Poor</label><label class="choice"><input type="radio" name="balDynamicStand" value="Unable">Unable</label><label class="choice"><input type="radio" name="balDynamicStand" value="DNT">DNT</label></div></div></div></div>
+<textarea id="balanceNote" placeholder="Balance notes: UE support, reaching, perturbations, tolerance"></textarea>
+
+<div class="section-title">Additional Notes</div>
+<textarea id="additionalNote" style="min-height:140px" placeholder="Type anything else you want included in the summary"></textarea>
+
+</form>
+
+<div class="card">
+  <h2>Generated Output</h2>
+  <div class="tabs">
+    <button class="tab active" data-tab="bulletPanel" type="button">Bullets</button>
+    <button class="tab" data-tab="nethealthPanel" type="button">NetHealth</button>
+    <button class="tab" data-tab="checklistPanel" type="button">Checklist</button>
+  </div>
+  <div id="bulletPanel" class="output-panel active"><textarea id="bulletOutput" class="output" readonly></textarea></div>
+  <div id="nethealthPanel" class="output-panel"><textarea id="nethealthOutput" class="output" readonly></textarea></div>
+  <div id="checklistPanel" class="output-panel"><textarea id="checklistOutput" class="output" readonly></textarea></div>
+
+  <div class="actions">
+    <button class="primary" id="generateBtn" type="button">Generate Output</button>
+    <button class="dark" id="copyBtn" type="button">Copy Current Tab</button>
+    <button class="light" id="printBtn" type="button">Open Summary / Print</button>
+    <button class="danger" id="clearBtn" type="button">Clear Form</button>
+  </div>
+  <div id="status" class="status"></div>
+</div>
+
+</div>
+
+<script>
+(function(){
+const form=document.getElementById("evalForm");
+const status=document.getElementById("status");
+const KEY="ptEvalV21";
+
+const assistLevels=["Independent","Modified independent","Setup","Supervision","SBA","CGA","Min A","Mod A","Max A","TD+","TD","Unable","DNT"];
+const romLevels=["WNL","WFL","Impaired","DNT"];
+const mmtGrades=["5","4+","4","4-","3+","3","3-","2+","2","2-","1","0","DNT"];
+const balanceLevels=["Normal","Good+","Good","Good-","Fair+","Fair","Fair-","Poor+","Poor","Unable","DNT"];
+
+const rom=[["L hip","romLHip"],["L knee","romLKnee"],["L ankle","romLAnkle"],["R hip","romRHip"],["R knee","romRKnee"],["R ankle","romRAnkle"]];
+const grossMmt=[["Gross LLE","mmtLLE"],["Gross RLE","mmtRLE"]];
+const jointMmt=[["L hip","mmtLHip"],["L knee","mmtLKnee"],["L ankle","mmtLAnkle"],["R hip","mmtRHip"],["R knee","mmtRKnee"],["R ankle","mmtRAnkle"]];
+const bed=[["Rolling left","rollL"],["Rolling right","rollR"],["Supine → sit","supSit"],["Sit → supine","sitSup"]];
+const transfers=[["Sit → stand","sitStand"],["Stand → sit","standSit"],["Bed ↔ chair/WC","bedChair"],["Toilet transfer","toiletTransfer"]];
+const balances=[["Static sitting","balStaticSit"],["Dynamic sitting","balDynamicSit"],["Static standing","balStaticStand"],["Dynamic standing","balDynamicStand"]];
+
+function choiceHtml(name,values){
+  return `<div class="choices">${values.map(v=>`<label class="choice"><input type="radio" name="${name}" value="${v}">${v}</label>`).join("")}</div>`;
+}
+function rowHtml(label,name,values){
+  return `<div class="row"><div class="rowname">${label}</div><div>${choiceHtml(name,values)}</div></div>`;
+}
+document.getElementById("romRows").innerHTML=rom.map(x=>rowHtml(x[0],x[1],romLevels)).join("");
+document.getElementById("grossMmtRows").innerHTML=grossMmt.map(x=>rowHtml(x[0],x[1],mmtGrades)).join("");
+document.getElementById("jointMmtRows").innerHTML=jointMmt.map(x=>rowHtml(x[0],x[1],mmtGrades)).join("");
+document.getElementById("bedRows").innerHTML=bed.map(x=>rowHtml(x[0],x[1],assistLevels)).join("");
+document.getElementById("transferRows").innerHTML=transfers.map(x=>rowHtml(x[0],x[1],assistLevels)).join("");
+document.getElementById("gaitAssistChoices").innerHTML=assistLevels.map(v=>`<label class="choice"><input type="radio" name="gaitAssist" value="${v}">${v}</label>`).join("");
+document.getElementById("balanceRows").innerHTML=balances.map(x=>rowHtml(x[0],x[1],balanceLevels)).join("");
+
+function radio(name){const e=form.querySelector(`input[name="${name}"]:checked`);return e?e.value:"";}
+function checks(name){return [...form.querySelectorAll(`input[name="${name}"]:checked`)].map(e=>e.value);}
+function val(id){return document.getElementById(id).value.trim();}
+function updateStyles(){
+  document.querySelectorAll(".choice").forEach(l=>{
+    const i=l.querySelector("input");
+    l.classList.toggle("active",!!(i&&i.checked));
+  });
+}
+function resizeOutputs(){
+  document.querySelectorAll(".output").forEach(e=>{
+    e.style.height="auto";
+    e.style.height=Math.max(300,e.scrollHeight+4)+"px";
+  });
+}
+function aoResult(){
+  const answered=["aoName","aoYear","aoMonth","aoPlace","aoFacility","condition"].filter(n=>radio(n)).length;
+  if(answered<4)return {count:null,text:"Not enough information",details:""};
+  const person=radio("aoName")==="Correct";
+  const place=radio("aoPlace")==="Correct" || radio("aoFacility")==="Correct";
+  const time=radio("aoYear")==="Correct" && radio("aoMonth")==="Correct";
+  const situation=radio("condition")==="Correct";
+  const domains=[["person",person],["place",place],["time",time],["situation",situation]];
+  const correct=domains.filter(d=>d[1]).map(d=>d[0]);
+  const missed=domains.filter(d=>!d[1]).map(d=>d[0]);
+  return {
+    count:correct.length,
+    text:`A&O ×${correct.length}`,
+    details:missed.length?`disoriented to ${missed.join(", ")}`:"oriented to person, place, time, and situation"
+  };
+}
+function updateAoBadge(){
+  const a=aoResult();
+  document.getElementById("aoBadge").textContent=`A&O level: ${a.text}${a.details?` (${a.details})`:""}`;
+}
+function collectRows(items){return items.map(([label,name])=>[label,radio(name)]).filter(x=>x[1]);}
+function formatPairs(pairs){return pairs.map(([l,v])=>`${l}: ${v}`).join("; ");}
+function phqScore(){
+  const n=v=>v?parseInt(v.charAt(0),10):null;
+  const a=n(radio("phq1")),b=n(radio("phq2"));
+  return (a===null||b===null)?null:a+b;
+}
+function getData(){
+  const a=aoResult(), phq=phqScore();
+  return {
+    patient:[val("patientName"),val("room")?`Room ${val("room")}`:""].filter(Boolean).join(" — "),
+    ao:a,
+    aoDetails:[
+      ["Name/person",radio("aoName"),val("aoNameNote")],
+      ["Year",radio("aoYear"),val("aoYearNote")],
+      ["Month",radio("aoMonth"),val("aoMonthNote")],
+      ["Place",radio("aoPlace"),val("aoPlaceNote")],
+      ["Facility",radio("aoFacility"),val("aoFacilityNote")]
+    ].filter(x=>x[1]||x[2]),
+    condition:[radio("condition"),val("conditionNote")].filter(Boolean).join(" — "),
+    plof:[radio("plof"),val("plofNote")].filter(Boolean).join(" — "),
+    living:[radio("living"),val("livingNote")].filter(Boolean).join(" — "),
+    home:[radio("homeType"),val("ste")?`${val("ste")} STE`:"",val("homeNote")].filter(Boolean).join(", "),
+    pain:[val("painLocation"),val("painRating")?`${val("painRating")}/10`:"",val("painType"),val("painNote")].filter(Boolean).join(", "),
+    devices:[checks("device").join(", "),val("deviceNote")].filter(Boolean).join(" — "),
+    vision:[radio("vision"),val("sensoryNote")].filter(Boolean).join(" — "),
+    hearing:radio("hearing"),
+    falls:[radio("falls"),val("fallNote")].filter(Boolean).join(" — "),
+    fearFall:radio("fearFall"),
+    difficult:val("difficultTask"),
+    phq1:radio("phq1"),
+    phq2:radio("phq2"),
+    phqScore:phq,
+    rom:collectRows(rom),romNote:val("romNote"),
+    grossMmt:collectRows(grossMmt),jointMmt:collectRows(jointMmt),mmtNote:val("mmtNote"),
+    bed:collectRows(bed),bedNote:val("bedNote"),
+    transfers:collectRows(transfers),transferNote:val("transferNote"),
+    gaitAssist:radio("gaitAssist"),gaitFeet:val("gaitFeet"),gaitDevice:val("gaitDevice"),gaitTrials:val("gaitTrials"),gaitNote:val("gaitNote"),
+    balance:collectRows(balances),balanceNote:val("balanceNote"),
+    additional:val("additionalNote")
+  };
+}
+function bullet(d){
+  const L=[];
+  if(d.patient)L.push(`• Patient: ${d.patient}`);
+  if(d.ao.count!==null)L.push(`• Orientation: ${d.ao.text} (${d.ao.details})`);
+  d.aoDetails.forEach(([l,v,n])=>L.push(`  ◦ ${l}: ${[v,n].filter(Boolean).join(" — ")}`));
+  if(d.condition)L.push(`• Understanding of condition: ${d.condition}`);
+  if(d.plof)L.push(`• PLOF: ${d.plof}`);
+  if(d.living)L.push(`• Living situation: ${d.living}`);
+  if(d.home)L.push(`• Home setup: ${d.home}`);
+  if(d.pain)L.push(`• Pain: ${d.pain}`);
+  if(d.devices)L.push(`• Prior device: ${d.devices}`);
+  if(d.vision||d.hearing)L.push(`• Vision/Hearing: ${[d.vision?`Vision ${d.vision}`:"",d.hearing?`Hearing ${d.hearing}`:""].filter(Boolean).join("; ")}`);
+  if(d.falls)L.push(`• Falls: ${d.falls}`);
+  if(d.fearFall)L.push(`• Fear of falling: ${d.fearFall}`);
+  if(d.difficult)L.push(`• Most difficult task: ${d.difficult}`);
+  if(d.phq1||d.phq2)L.push(`• PHQ-2: Q1 ${d.phq1||"not entered"}; Q2 ${d.phq2||"not entered"}${d.phqScore!==null?`; total ${d.phqScore}/6`:""}`);
+  if(d.rom.length||d.romNote)L.push(`• ROM: ${[formatPairs(d.rom),d.romNote].filter(Boolean).join(" — ")}`);
+  if(d.grossMmt.length)L.push(`• Gross MMT: ${formatPairs(d.grossMmt)}`);
+  if(d.jointMmt.length||d.mmtNote)L.push(`• Joint-specific MMT: ${[formatPairs(d.jointMmt),d.mmtNote].filter(Boolean).join(" — ")}`);
+  if(d.bed.length||d.bedNote)L.push(`• Bed mobility: ${[formatPairs(d.bed),d.bedNote].filter(Boolean).join(" — ")}`);
+  if(d.transfers.length||d.transferNote)L.push(`• Transfers: ${[formatPairs(d.transfers),d.transferNote].filter(Boolean).join(" — ")}`);
+  const gait=[d.gaitAssist,d.gaitFeet?`${d.gaitFeet} ft`:"",d.gaitDevice,d.gaitTrials?`${d.gaitTrials} trial(s)`:"",d.gaitNote].filter(Boolean).join(", ");
+  if(gait)L.push(`• Ambulation: ${gait}`);
+  if(d.balance.length||d.balanceNote)L.push(`• Balance: ${[formatPairs(d.balance),d.balanceNote].filter(Boolean).join(" — ")}`);
+  if(d.additional)L.push(`• Additional notes: ${d.additional}`);
+  return L.join("\n");
+}
+function nethealth(d){
+  const S=[];
+  if(d.patient)S.push(`Patient: ${d.patient}.`);
+  if(d.ao.count!==null)S.push(`Pt is ${d.ao.text} and ${d.ao.details}.`);
+  if(d.condition)S.push(`Understanding of current condition: ${d.condition}.`);
+  if(d.plof)S.push(`PLOF: ${d.plof}.`);
+  if(d.living)S.push(`Living situation: ${d.living}.`);
+  if(d.home)S.push(`Home setup: ${d.home}.`);
+  if(d.pain)S.push(`Pain: ${d.pain}.`);
+  if(d.devices)S.push(`Prior AD/DME: ${d.devices}.`);
+  if(d.vision||d.hearing)S.push(`Vision/hearing: ${[d.vision?`vision ${d.vision}`:"",d.hearing?`hearing ${d.hearing}`:""].filter(Boolean).join("; ")}.`);
+  if(d.falls)S.push(`Fall history: ${d.falls}.`);
+  if(d.fearFall)S.push(`Fear of falling: ${d.fearFall}.`);
+  if(d.difficult)S.push(`Primary functional difficulty: ${d.difficult}.`);
+  if(d.phq1||d.phq2)S.push(`PHQ-2 responses: ${d.phq1||"not entered"} and ${d.phq2||"not entered"}${d.phqScore!==null?`, total ${d.phqScore}/6`:""}.`);
+  if(d.rom.length||d.romNote)S.push(`ROM: ${[formatPairs(d.rom),d.romNote].filter(Boolean).join(". ")}.`);
+  if(d.grossMmt.length)S.push(`Gross LE strength: ${formatPairs(d.grossMmt)}.`);
+  if(d.jointMmt.length||d.mmtNote)S.push(`Joint-specific strength: ${[formatPairs(d.jointMmt),d.mmtNote].filter(Boolean).join(". ")}.`);
+  if(d.bed.length||d.bedNote)S.push(`Bed mobility: ${[formatPairs(d.bed),d.bedNote].filter(Boolean).join(". ")}.`);
+  if(d.transfers.length||d.transferNote)S.push(`Transfers: ${[formatPairs(d.transfers),d.transferNote].filter(Boolean).join(". ")}.`);
+  const gait=[d.gaitAssist,d.gaitFeet?`${d.gaitFeet} ft`:"",d.gaitDevice,d.gaitTrials?`${d.gaitTrials} trial(s)`:""].filter(Boolean).join(", ");
+  if(gait||d.gaitNote)S.push(`Ambulation: ${[gait,d.gaitNote].filter(Boolean).join(". ")}.`);
+  if(d.balance.length||d.balanceNote)S.push(`Balance: ${[formatPairs(d.balance),d.balanceNote].filter(Boolean).join(". ")}.`);
+  if(d.additional)S.push(d.additional);
+  return S.join(" ");
+}
+function checklist(d){
+  const rows=[
+    ["Patient",d.patient],
+    ["Orientation",d.ao.count===null?"Not enough information":`${d.ao.text} (${d.ao.details})`],
+    ["Condition understanding",d.condition],["PLOF",d.plof],["Living situation",d.living],["Home setup",d.home],
+    ["Pain",d.pain],["Prior device",d.devices],
+    ["Vision/Hearing",[d.vision,d.hearing].filter(Boolean).join("; ")],
+    ["Falls",d.falls],["Fear of falling",d.fearFall],["Most difficult task",d.difficult],
+    ["PHQ-2",(d.phq1||d.phq2)?`${d.phq1||"not entered"}; ${d.phq2||"not entered"}${d.phqScore!==null?`; total ${d.phqScore}/6`:""}`:""],
+    ["ROM",[formatPairs(d.rom),d.romNote].filter(Boolean).join(" — ")],
+    ["Gross MMT",formatPairs(d.grossMmt)],
+    ["Joint MMT",[formatPairs(d.jointMmt),d.mmtNote].filter(Boolean).join(" — ")],
+    ["Bed mobility",[formatPairs(d.bed),d.bedNote].filter(Boolean).join(" — ")],
+    ["Transfers",[formatPairs(d.transfers),d.transferNote].filter(Boolean).join(" — ")],
+    ["Ambulation",[d.gaitAssist,d.gaitFeet?`${d.gaitFeet} ft`:"",d.gaitDevice,d.gaitTrials?`${d.gaitTrials} trial(s)`:"",d.gaitNote].filter(Boolean).join(", ")],
+    ["Balance",[formatPairs(d.balance),d.balanceNote].filter(Boolean).join(" — ")],
+    ["Additional notes",d.additional]
+  ];
+  return rows.map(([l,v])=>`☐ ${l}: ${v||"Not entered"}`).join("\n");
+}
+function generate(){
+  const d=getData();
+  document.getElementById("bulletOutput").value=bullet(d);
+  document.getElementById("nethealthOutput").value=nethealth(d);
+  document.getElementById("checklistOutput").value=checklist(d);
+  resizeOutputs();save();status.textContent="Output generated.";
+}
+function activeOutput(){return document.querySelector(".output-panel.active textarea");}
+async function copyCurrent(){
+  if(!activeOutput().value)generate();
+  try{await navigator.clipboard.writeText(activeOutput().value);status.textContent="Copied."}
+  catch(e){activeOutput().select();document.execCommand("copy");status.textContent="Copied."}
+}
+function save(){
+  const o={};
+  form.querySelectorAll("input,textarea,select").forEach((e,i)=>{
+    o[e.id||`${e.name}_${i}`]={value:e.value,checked:e.checked};
+  });
+  localStorage.setItem(KEY,JSON.stringify(o));
+}
+function load(){
+  try{
+    const o=JSON.parse(localStorage.getItem(KEY)||"{}");
+    form.querySelectorAll("input,textarea,select").forEach((e,i)=>{
+      const k=e.id||`${e.name}_${i}`;
+      if(o[k]){e.value=o[k].value||"";e.checked=!!o[k].checked}
+    });
+  }catch(e){}
+  updateStyles();updateAoBadge();
+}
+function clearAll(){
+  if(!confirm("Clear all entries?"))return;
+  form.reset();
+  document.querySelectorAll(".output").forEach(e=>e.value="");
+  localStorage.removeItem(KEY);
+  updateStyles();updateAoBadge();status.textContent="Cleared.";
+}
+
+form.addEventListener("change",()=>{updateStyles();updateAoBadge();save()});
+form.addEventListener("input",save);
+document.addEventListener("click",e=>{
+  const l=e.target.closest(".choice");
+  if(l)setTimeout(()=>{updateStyles();updateAoBadge();save()},0);
+});
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+  document.querySelectorAll(".output-panel").forEach(x=>x.classList.remove("active"));
+  t.classList.add("active");
+  document.getElementById(t.dataset.tab).classList.add("active");
+  setTimeout(resizeOutputs,0);
+}));
+document.getElementById("generateBtn").onclick=generate;
+document.getElementById("copyBtn").onclick=copyCurrent;
+document.getElementById("clearBtn").onclick=clearAll;
+
+document.getElementById("printBtn").onclick=()=>{
+  generate();
+  const content={
+    bullet:document.getElementById("bulletOutput").value,
+    nethealth:document.getElementById("nethealthOutput").value,
+    checklist:document.getElementById("checklistOutput").value
+  };
+  const w=window.open("","_blank");
+  if(!w){status.textContent="Allow pop-ups, then try again.";return;}
+  const safe=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PT Eval Summary</title><style>
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;margin:0;padding:18px;background:#f3f5f7;color:#1f2937}
+  .page{max-width:850px;margin:auto;background:white;padding:18px;border-radius:16px}
+  .tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}
+  .tab{padding:11px;border:1px solid #d1d5db;border-radius:10px;background:white;font-weight:700}
+  .tab.active{background:#eaf2f8;color:#1f4e78;border-color:#1f4e78}
+  .panel{display:none}.panel.active{display:block}
+  pre{white-space:pre-wrap;font:inherit;line-height:1.5;border:2px solid #374151;border-radius:10px;padding:14px;background:#fffdf7}
+  .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+  .action{padding:13px;border:0;border-radius:10px;font-size:16px;font-weight:800}
+  .print{background:#1f4e78;color:white}.copy{background:#111827;color:white}
+  @media print{@page{margin:.55in}body{padding:0;background:white}.page{padding:0}.tabs,.actions{display:none}.panel{display:none!important}.panel.active{display:block!important}pre{border:0;padding:0;background:white}}
+  </style></head><body><div class="page"><h1>PT Eval Summary</h1><div class="tabs">
+  <button class="tab active" data-p="b">Bullet Points</button>
+  <button class="tab" data-p="n">NetHealth</button>
+  <button class="tab" data-p="c">Checklist</button></div>
+  <section id="b" class="panel active"><pre>${safe(content.bullet)}</pre></section>
+  <section id="n" class="panel"><pre>${safe(content.nethealth)}</pre></section>
+  <section id="c" class="panel"><pre>${safe(content.checklist)}</pre></section>
+  <div class="actions"><button class="action print" onclick="window.print()">Print / Save PDF</button>
+  <button class="action copy" id="copy">Copy Selected</button></div></div>
+  <script>
+  document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
+    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+    document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));
+    t.classList.add("active");document.getElementById(t.dataset.p).classList.add("active");
+  });
+  document.getElementById("copy").onclick=async()=>{
+    const x=document.querySelector(".panel.active pre").innerText;
+    try{await navigator.clipboard.writeText(x)}catch(e){}
+  };
+  <\/script></body></html>`);
+  w.document.close();
+};
+
+load();
+})();
+</script>
+</body>
+</html>
